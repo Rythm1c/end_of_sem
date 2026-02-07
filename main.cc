@@ -4,22 +4,12 @@
 #include "headers/battery.h"
 #include "headers/driver.h"
 #include "headers/admin.h"
-
-#define ANSI_COLOR_RED "\x1b[31m"
-#define ANSI_COLOR_GREEN "\x1b[32m"
-#define ANSI_COLOR_YELLOW "\x1b[33m"
-#define ANSI_COLOR_DEFAULT "\x1b[0m"
-
-int mainMenu();
-int loginMenu();
-
-Administrator adminRegisterMenu();
-int adminMenu();
+#include "headers/menus.h"
 
 int main(void)
 {
-
   Database db;
+
   std::cout << "loading admins database..." << std::endl;
   db.loadAdmins();
   std::cout << "loading drivers database..." << std::endl;
@@ -42,7 +32,7 @@ int main(void)
       {
         std::cout << std::endl;
         std::cout << "Admin login selected." << std::endl;
-        int *admin_id = nullptr;
+        auto *admin_id = adminLoginMenu(db);
       }
       else if (loginOption == 2)
       {
@@ -64,7 +54,7 @@ int main(void)
     {
       std::cout << std::endl;
       std::cout << "register a new admin selected" << std::endl;
-      Administrator admin = adminRegisterMenu();
+      auto admin = adminRegisterMenu();
       db.addAdmin(new Administrator(admin));
     }
 
@@ -73,114 +63,9 @@ int main(void)
       break;
     }
   }
-  /*
-  db.addAdmin(new Administrator("admin1", "adminpass1"));
-  db.addDriver(new Driver("driver1", "driverpass1", "ABC123", 100.0));
-  db.addBattery(new Battery("Li-Ion", 75.0, 80, 90, STATUS_READY)); */
-  
+
   db.saveAll();
   db.clear();
 
   return 0;
-}
-
-int mainMenu()
-{
-  std::cout << ANSI_COLOR_YELLOW << "=== Main Menu ===" << ANSI_COLOR_DEFAULT << std::endl;
-  std::cout << "1. login" << std::endl;
-  std::cout << "2. register" << std::endl;
-  std::cout << ANSI_COLOR_RED << "3. Exit" << ANSI_COLOR_DEFAULT << std::endl;
-
-  int choice;
-
-  while (true)
-  {
-    std::cin >> choice;
-    if (choice == 1 || choice == 2 || choice == 3)
-    {
-      break;
-    }
-    else
-    {
-      std::cout << "Invalid choice. Please try again." << std::endl;
-    }
-  }
-
-  return choice;
-}
-
-int loginMenu()
-{
-  int choice;
-
-  std::cout << ANSI_COLOR_YELLOW << "=== Login Menu ===" << ANSI_COLOR_DEFAULT << std::endl;
-  std::cout << "1. Admin Login" << std::endl;
-  std::cout << "2. Driver Login" << std::endl;
-  std::cout << "3. back" << std::endl;
-  std::cout << ANSI_COLOR_RED << "4. Exit" << ANSI_COLOR_DEFAULT << std::endl;
-
-  while (true)
-  {
-
-    std::cin >> choice;
-
-    if (choice == 1 || choice == 2 || choice == 3 || choice == 4)
-    {
-      break;
-    }
-    else
-    {
-      std::cout << "Invalid choice. Please try again." << std::endl;
-    }
-  }
-
-  return choice;
-}
-
-Administrator adminRegisterMenu()
-{
-  std::cout << ANSI_COLOR_YELLOW << "=== Admin Register Menu ===" << ANSI_COLOR_DEFAULT << std::endl;
-  std::string name, password, confirmation;
-
-  std::cout << "Enter your name: ";
-  std::cin >> name;
-
-  std::cout << "Enter your password: ";
-  std::cin >> password;
-
-  while (true)
-  {
-    std::cout << "confirm your password: ";
-    std::cin >> confirmation;
-
-    if (confirmation == password)
-      break;
-    else
-      std::cout << "passwords do not match!" << std::endl;
-  }
-
-  return Administrator(name, password);
-}
-
-int adminMenu()
-{
-
-  std::cout << "1. list available batteries" << std::endl;
-  std::cout << "2. list EV drivers" << std::endl;
-  std::cout << "3. create driver account" << std::endl;
-  std::cout << "4. manage batteries" << std::endl;
-  std::cout << "5. logout" << std::endl;
-
-  int choice;
-
-  while (true)
-  {
-    std::cin >> choice;
-    if (choice == 1 || choice == 2 || choice == 3)
-      break;
-    else
-      std::cout << "invalid option try again." << std::endl;
-  }
-
-  return choice;
 }

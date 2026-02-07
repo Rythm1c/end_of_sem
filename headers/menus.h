@@ -1,6 +1,13 @@
 #ifndef MENUS_H
 #define MENUS_H
 
-void loginMenu();
+#include "admin.h"
+
+int mainMenu();
+int loginMenu();
+
+Administrator adminRegisterMenu();
+Administrator *adminLoginMenu(const struct Database &db);
+int adminMenu();
 
 #endif
