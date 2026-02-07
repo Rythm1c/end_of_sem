@@ -1,11 +1,8 @@
 #include "headers/menus.h"
 #include "headers/database.h"
+#include "headers/battery.h"
 #include <iostream>
-
-#define ANSI_COLOR_RED "\x1b[31m"
-#define ANSI_COLOR_GREEN "\x1b[32m"
-#define ANSI_COLOR_YELLOW "\x1b[33m"
-#define ANSI_COLOR_DEFAULT "\x1b[0m"
+#include <iomanip>
 
 int mainMenu()
 {
@@ -117,7 +114,10 @@ Administrator *adminLoginMenu(const Database &db)
         }
 
         if (found)
+        {
+            std::cout << ANSI_COLOR_GREEN << "Welcome back " << name << ANSI_COLOR_DEFAULT << std::endl;
             break;
+        }
 
         std::cout << ANSI_COLOR_RED << "invalid login details!\n"
                   << "username or password wrong!" << ANSI_COLOR_DEFAULT << std::endl;
@@ -133,18 +133,78 @@ int adminMenu()
     std::cout << "2. list EV drivers" << std::endl;
     std::cout << "3. create driver account" << std::endl;
     std::cout << "4. manage batteries" << std::endl;
-    std::cout << "5. logout" << std::endl;
+    std::cout << ANSI_COLOR_RED << "5. logout" << ANSI_COLOR_DEFAULT << std::endl;
 
     int choice;
 
     while (true)
     {
         std::cin >> choice;
-        if (choice == 1 || choice == 2 || choice == 3)
+        if (choice == 1 || choice == 2 || choice == 3 || choice == 4 || choice == 5)
             break;
         else
             std::cout << ANSI_COLOR_RED << "invalid option. try again!" << ANSI_COLOR_DEFAULT << std::endl;
     }
 
     return choice;
+}
+
+void listBatteriesMenu(const Database &db)
+{
+    std::cout << ANSI_COLOR_YELLOW << std::left
+              << std::setw(6) << "ID"
+              << std::setw(15) << "Type"
+              << std::setw(15) << "Capacity(kWh)"
+              << std::setw(8) << "SOC(%)"
+              << std::setw(8) << "SOH(%)"
+              << std::setw(15) << "Status"
+              << ANSI_COLOR_DEFAULT << std::endl;
+
+    std::cout << ANSI_COLOR_YELLOW << std::string(67, '-') << ANSI_COLOR_DEFAULT << std::endl;
+
+    if (db.batteries.empty())
+    {
+        std::cout << ANSI_COLOR_PURPLE << "No batteries available." << ANSI_COLOR_DEFAULT << std::endl;
+    }
+    else
+    {
+        for (auto &pair : db.batteries)
+        {
+            int id = pair.first;
+            Battery *battery = pair.second;
+
+            std::string status_str;
+            switch (battery->status)
+            {
+            case STATUS_CHARGING:
+                status_str = "Charging";
+                break;
+            case STATUS_READY:
+                status_str = "Ready";
+                break;
+            case STATUS_MAINTENANCE:
+                status_str = "Maintenance";
+                break;
+            case STATUS_RENTED:
+                status_str = "Rented";
+                break;
+            default:
+                status_str = "Unknown";
+            }
+
+            std::cout << ANSI_COLOR_PURPLE << std::left
+                      << std::setw(6) << id
+                      << std::setw(15) << battery->type
+                      << std::setw(15) << battery->capacity_KWh
+                      << std::setw(8) << battery->soc
+                      << std::setw(8) << battery->soh
+                      << std::setw(15) << status_str
+                      << ANSI_COLOR_DEFAULT << std::endl;
+        }
+    }
+
+    std::cout << std::endl;
+    std::cout << "Press Enter to return to admin menu...";
+    std::cin.ignore();
+    std::cin.get();
 }

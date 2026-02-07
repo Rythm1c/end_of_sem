@@ -32,7 +32,24 @@ int main(void)
       {
         std::cout << std::endl;
         std::cout << "Admin login selected." << std::endl;
-        auto *admin_id = adminLoginMenu(db);
+        auto *p_admin = adminLoginMenu(db);
+
+        if (p_admin != nullptr)
+        {
+          std::cout << std::endl;
+          while (p_admin != nullptr)
+          {
+            int adminMenuOption = adminMenu();
+            if (adminMenuOption == 5)
+            {
+              p_admin = nullptr;
+            }
+            else if (adminMenuOption == 1)
+            {
+              listBatteriesMenu(db);
+            }
+          }
+        }
       }
       else if (loginOption == 2)
       {
