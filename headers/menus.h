@@ -8,13 +8,16 @@
 #define ANSI_COLOR_DEFAULT "\x1b[0m"
 
 #include "admin.h"
+#include <string>
 
-int mainMenu();
-int loginMenu();
+std::string mainMenu();
+std::string loginMenu();
+std::string adminMenu();
 
 Administrator adminRegisterMenu();
 Administrator *adminLoginMenu(const struct Database &db);
-int adminMenu();
+
 void listBatteriesMenu(const struct Database &db);
+void listDriversMenu(const struct Database &db);
 
 #endif

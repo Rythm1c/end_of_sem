@@ -1,22 +1,23 @@
 #include "headers/menus.h"
 #include "headers/database.h"
 #include "headers/battery.h"
+#include "headers/driver.h"
 #include <iostream>
 #include <iomanip>
 
-int mainMenu()
+std::string mainMenu()
 {
     std::cout << ANSI_COLOR_YELLOW << "=== Main Menu ===" << ANSI_COLOR_DEFAULT << std::endl;
     std::cout << "1. login" << std::endl;
     std::cout << "2. register" << std::endl;
     std::cout << ANSI_COLOR_RED << "3. Exit" << ANSI_COLOR_DEFAULT << std::endl;
 
-    int choice;
+    std::string choice;
 
     while (true)
     {
         std::cin >> choice;
-        if (choice == 1 || choice == 2 || choice == 3)
+        if (choice == "1" || choice == "2" || choice == "3")
         {
             break;
         }
@@ -29,9 +30,9 @@ int mainMenu()
     return choice;
 }
 
-int loginMenu()
+std::string loginMenu()
 {
-    int choice;
+    std::string choice;
 
     std::cout << ANSI_COLOR_YELLOW << "=== Login Menu ===" << ANSI_COLOR_DEFAULT << std::endl;
     std::cout << "1. Admin Login" << std::endl;
@@ -44,7 +45,7 @@ int loginMenu()
 
         std::cin >> choice;
 
-        if (choice == 1 || choice == 2 || choice == 3 || choice == 4)
+        if (choice == "1" || choice == "2" || choice == "3" || choice == "4")
         {
             break;
         }
@@ -63,7 +64,7 @@ Administrator adminRegisterMenu()
     std::string name, password, confirmation;
 
     std::cout << "Enter your name: ";
-    std::cin >> name;
+    std::getline(std::cin, name);
 
     std::cout << "Enter your password: ";
     std::cin >> password;
@@ -126,7 +127,7 @@ Administrator *adminLoginMenu(const Database &db)
     return p_admin;
 }
 
-int adminMenu()
+std::string adminMenu()
 {
 
     std::cout << "1. list available batteries" << std::endl;
@@ -135,12 +136,12 @@ int adminMenu()
     std::cout << "4. manage batteries" << std::endl;
     std::cout << ANSI_COLOR_RED << "5. logout" << ANSI_COLOR_DEFAULT << std::endl;
 
-    int choice;
+    std::string choice;
 
     while (true)
     {
         std::cin >> choice;
-        if (choice == 1 || choice == 2 || choice == 3 || choice == 4 || choice == 5)
+        if (choice == "1" || choice == "2" || choice == "3" || choice == "4" || choice == "5")
             break;
         else
             std::cout << ANSI_COLOR_RED << "invalid option. try again!" << ANSI_COLOR_DEFAULT << std::endl;
@@ -199,6 +200,43 @@ void listBatteriesMenu(const Database &db)
                       << std::setw(8) << battery->soc
                       << std::setw(8) << battery->soh
                       << std::setw(15) << status_str
+                      << ANSI_COLOR_DEFAULT << std::endl;
+        }
+    }
+
+    std::cout << std::endl;
+    std::cout << "Press Enter to return to admin menu...";
+    std::cin.ignore();
+    std::cin.get();
+}
+
+void listDriversMenu(const Database &db)
+{
+    std::cout << ANSI_COLOR_YELLOW << std::left
+              << std::setw(6) << "ID"
+              << std::setw(20) << "Name"
+              << std::setw(20) << "License Plate"
+              << std::setw(12) << "Credits"
+              << ANSI_COLOR_DEFAULT << std::endl;
+
+    std::cout << ANSI_COLOR_YELLOW << std::string(58, '-') << ANSI_COLOR_DEFAULT << std::endl;
+
+    if (db.drivers.empty())
+    {
+        std::cout << ANSI_COLOR_PURPLE << "No drivers available." << ANSI_COLOR_DEFAULT << std::endl;
+    }
+    else
+    {
+        for (auto &pair : db.drivers)
+        {
+            int id = pair.first;
+            Driver *driver = pair.second;
+
+            std::cout << ANSI_COLOR_PURPLE << std::left
+                      << std::setw(6) << id
+                      << std::setw(20) << driver->name
+                      << std::setw(20) << driver->plate
+                      << std::setw(12) << std::fixed << std::setprecision(2) << driver->credits
                       << ANSI_COLOR_DEFAULT << std::endl;
         }
     }

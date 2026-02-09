@@ -1,30 +1,37 @@
 @echo off
-REM Create output directories
-if not exist obj mkdir obj
-if not exist bin mkdir bin
+REM CMake build script for Windows (Batch version)
+REM This script configures and builds the project using CMake
 
-REM Compile the project
-echo Compiling...
-g++ -Wall -Wextra -std=c++11 -c main.cc -o obj/main.o
-g++ -Wall -Wextra -std=c++11 -c admin.cc -o obj/admin.o
-g++ -Wall -Wextra -std=c++11 -c battery.cc -o obj/battery.o
-g++ -Wall -Wextra -std=c++11 -c database.cc -o obj/database.o
-g++ -Wall -Wextra -std=c++11 -c driver.cc -o obj/driver.o
-g++ -Wall -Wextra -std=c++11 -c menus.cc -o obj/menus.o
+echo CMake Build Script
+echo.
 
+REM Create build directory if it doesn't exist
+if not exist build mkdir build
+
+REM Enter build directory
+cd build
+
+REM Configure the project
+echo Configuring CMake...
+cmake ..
 
 if errorlevel 1 (
-    echo Compilation failed!
+    echo CMake configuration failed!
+    cd ..
     exit /b 1
 )
 
-REM Link
-echo Linking...
-g++ -o bin/project.exe obj/main.o obj/admin.o obj/battery.o obj/database.o obj/menus.o obj/driver.o
+REM Build the project
+echo Building project...
+cmake --build . --config Release
 
 if errorlevel 1 (
-    echo Linking failed!
+    echo Build failed!
+    cd ..
     exit /b 1
 )
 
+cd ..
+
+echo.
 echo Build successful! Run with: .\bin\project.exe

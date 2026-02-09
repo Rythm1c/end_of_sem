@@ -41,7 +41,6 @@ void Database::loadAdmins()
 void Database::addAdmin(Administrator *admin)
 {
     int newId = nextAdminId++;
-    //admins[newId] = admin;
     admins.insert(std::make_pair(newId, admin));
     adminsDirty = true;
 }

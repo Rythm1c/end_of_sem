@@ -20,15 +20,15 @@ int main(void)
   while (true)
   {
     std::cout << std::endl;
-    int mainMenuOption = mainMenu();
+    std::string mainMenuOption = mainMenu();
 
     // login selected
-    if (mainMenuOption == 1)
+    if (mainMenuOption == "1")
     {
       std::cout << std::endl;
       std::cout << "login selected" << std::endl;
-      int loginOption = loginMenu();
-      if (loginOption == 1)
+      std::string loginOption = loginMenu();
+      if (loginOption == "1")
       {
         std::cout << std::endl;
         std::cout << "Admin login selected." << std::endl;
@@ -39,35 +39,45 @@ int main(void)
           std::cout << std::endl;
           while (p_admin != nullptr)
           {
-            int adminMenuOption = adminMenu();
-            if (adminMenuOption == 5)
+            std::string adminMenuOption = adminMenu();
+            if (adminMenuOption == "5")
             {
               p_admin = nullptr;
             }
-            else if (adminMenuOption == 1)
+            else if (adminMenuOption == "1")
             {
               listBatteriesMenu(db);
+            }
+            else if (adminMenuOption == "2")
+            {
+              listDriversMenu(db);
+            }
+            else if (adminMenuOption == "3")
+            {
+            }
+            else if (adminMenuOption == "4")
+            {
             }
           }
         }
       }
-      else if (loginOption == 2)
+      else if (loginOption == "2")
       {
         std::cout << std::endl;
         std::cout << "Driver login selected." << std::endl;
       }
-      else if (loginOption == 3)
+      else if (loginOption == "3")
       {
         continue;
       }
-      else if (loginOption == 4)
+      else if (loginOption == "4")
       {
         break;
       }
     }
 
     // register selected
-    else if (mainMenuOption == 2)
+    else if (mainMenuOption == "2")
     {
       std::cout << std::endl;
       std::cout << "register a new admin selected" << std::endl;
