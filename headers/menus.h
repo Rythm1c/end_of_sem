@@ -1,23 +1,25 @@
 #ifndef MENUS_H
 #define MENUS_H
 
-#define ANSI_COLOR_RED "\x1b[31m"
-#define ANSI_COLOR_GREEN "\x1b[32m"
-#define ANSI_COLOR_YELLOW "\x1b[33m"
-#define ANSI_COLOR_PURPLE "\x1b[35m"
-#define ANSI_COLOR_DEFAULT "\x1b[0m"
-
 #include "admin.h"
+#include "driver.h"
 #include <string>
 
 std::string mainMenu();
 std::string loginMenu();
-std::string adminMenu();
 
+std::string adminMenu();
 Administrator adminRegisterMenu();
 Administrator *adminLoginMenu(const struct Database &db);
+std::string manageBatteriesMenu();
+struct Battery *addBatteryMenu();
+std::string batteryUpdateMenu();
 
-void listBatteriesMenu(const struct Database &db);
-void listDriversMenu(const struct Database &db);
+std::string driverMenu();
+Driver driverRegisterMenu();
+Driver *driverLoginMenu(const struct Database &db);
+
+struct Battery *selectBatteryForSwapMenu(const struct Database &db);
+int getOldBatterySoCMenu();
 
 #endif

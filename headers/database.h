@@ -53,6 +53,16 @@ struct Database
     bool adminExists(int);
     bool driverExists(int);
     bool batteryExists(int);
+    
+    /// "a" lists all drivers
+    /// "b" lists all available batteries
+    /// "c" lists all charging batteries
+    /// "d" lists all batteries under maintainance
+    void listBatteries(char);
+    void listDrivers();
+
+    // Battery swap operation
+    bool swapBattery(struct Driver *driver, int oldBatteryId, int newBatteryId, int oldSoC);
 
     void clear();
 };
