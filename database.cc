@@ -222,10 +222,10 @@ bool Database::swapBattery(struct Driver *driver, int oldBatteryId, int newBatte
     }
 
     // Perform the swap
-    driver->credits -= cost;            // Deduct cost from driver's credits
-    newBattery->status = STATUS_RENTED; // Mark new battery as rented
-    oldBattery->status = STATUS_READY;  // Old battery becomes ready for maintenance/recharge
-    oldBattery->soc = oldSoC;           // Update old battery's current SoC
+    driver->credits -= cost;              // Deduct cost from driver's credits
+    newBattery->status = STATUS_RENTED;   // Mark new battery as rented
+    oldBattery->status = STATUS_CHARGING; // Old battery becomes charging
+    oldBattery->soc = oldSoC;             // Update old battery's current SoC
 
     // Mark as dirty for save
     driversDirty = true;
