@@ -7,6 +7,10 @@
 
 #include <string>
 #include <map>
+#include <memory>
+#include "admin.h"
+#include "driver.h"
+#include "battery.h"
 
 struct Database
 {
@@ -18,9 +22,9 @@ struct Database
     bool driversDirty;
     bool batteriesDirty;
 
-    std::map<int, struct Administrator *> admins;
-    std::map<int, struct Driver *> drivers;
-    std::map<int, struct Battery *> batteries;
+    std::map<int, std::unique_ptr<Administrator>> admins;
+    std::map<int, std::unique_ptr<Driver>> drivers;
+    std::map<int, std::unique_ptr<Battery>> batteries;
 
     Database()
         : nextAdminId(1),
@@ -41,18 +45,18 @@ struct Database
     void saveBatteries();
     void saveAll();
 
-    void addAdmin(struct Administrator *);
-    void addDriver(struct Driver *);
-    void addBattery(struct Battery *);
+    void addAdmin(std::unique_ptr<Administrator>);
+    void addDriver(std::unique_ptr<Driver>);
+    void addBattery(std::unique_ptr<Battery>);
 
     void removeAdmin(int);
     void removeDriver(int);
     void removeBattery(int);
 
     // Helper methods for checking existence
-    bool adminExists(int);
-    bool driverExists(int);
-    bool batteryExists(int);
+    bool adminExists(int) const;
+    bool driverExists(int) const;
+    bool batteryExists(int) const;
     
     /// "a" lists all drivers
     /// "b" lists all available batteries

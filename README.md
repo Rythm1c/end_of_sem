@@ -64,17 +64,12 @@ The EV Battery Management System is a command-line application designed to manag
 
 ### On Windows
 
-#### Option 1: Using PowerShell script (Recommended)
-```powershell
-.\build.ps1
-```
-
-#### Option 2: Using batch script
+#### Option 1: Using batch script
 ```cmd
 build.bat
 ```
 
-#### Option 3: Using CMake (Cross-platform)
+#### Option 2: Using CMake (Cross-platform)
 ```cmd
 mkdir build
 cd build
@@ -83,14 +78,14 @@ make
 cd ..
 ```
 
-#### Option 4: Manual compilation with g++
+#### Option 3: Manual compilation with g++
 ```cmd
 g++ -o bin/battery_system main.cc admin.cc driver.cc battery.cc database.cc menus.cc -std=c++11
 ```
 
 ### On Linux/macOS
 
-#### Option 1: Using build.sh script (Recommended)
+#### Option 4: Using build.sh script (Recommended)
 ```bash
 chmod +x build.sh
 ./build.sh
@@ -98,7 +93,7 @@ chmod +x build.sh
 
 The build.sh script will automatically create a build directory, run CMake, and compile the project.
 
-#### Option 2: Using CMake manually
+#### Option 5: Using CMake manually
 ```bash
 mkdir build
 cd build
@@ -107,12 +102,12 @@ make
 cd ..
 ```
 
-#### Option 3: Using g++ directly
+#### Option 6: Using g++ directly
 ```bash
 g++ -o bin/battery_system main.cc admin.cc driver.cc battery.cc database.cc menus.cc -std=c++11
 ```
 
-#### Option 4: Using clang
+#### Option 7: Using clang
 ```bash
 clang++ -o bin/battery_system main.cc admin.cc driver.cc battery.cc database.cc menus.cc -std=c++11
 ```

@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <memory>
 
 std::string mainMenu()
 {
@@ -93,10 +94,9 @@ Administrator *adminLoginMenu(const Database &db)
 {
     std::cout << ANSI_COLOR_YELLOW << "=== Admin login Menu ===" << ANSI_COLOR_DEFAULT << std::endl;
     std::string name, password;
+    Administrator *p_admin = nullptr;
 
-    Administrator *p_admin;
-
-    while (true)
+    do
     {
         std::cout << "Enter your name: ";
         std::cin >> name;
@@ -104,31 +104,20 @@ Administrator *adminLoginMenu(const Database &db)
         std::cout << "Enter your password: ";
         std::cin >> password;
 
-        bool found = false;
         for (auto &pair : db.admins)
         {
-            auto admin = pair.second;
-            if (admin->name == name)
+            auto admin = pair.second.get();
+            if (admin->name == name && admin->password == password)
             {
-                if (admin->password == password)
-                {
-                    // once a match is found exit loop and return the admin user pointer
-                    p_admin = pair.second;
-                    found = true;
-                    break;
-                }
+                p_admin = pair.second.get();
+                std::cout << ANSI_COLOR_GREEN << "Welcome back " << name << ANSI_COLOR_DEFAULT << std::endl;
+                return p_admin;
             }
-        }
-
-        if (found)
-        {
-            std::cout << ANSI_COLOR_GREEN << "Welcome back " << name << ANSI_COLOR_DEFAULT << std::endl;
-            break;
         }
 
         std::cout << ANSI_COLOR_RED << "invalid login details!\n"
                   << "username or password wrong!" << ANSI_COLOR_DEFAULT << std::endl;
-    }
+    } while (p_admin == nullptr);
 
     return p_admin;
 }
@@ -189,10 +178,9 @@ Driver *driverLoginMenu(const struct Database &db)
 {
     std::cout << ANSI_COLOR_YELLOW << "=== Driver login Menu ===" << ANSI_COLOR_DEFAULT << std::endl;
     std::string name, password;
+    Driver *p_driver = nullptr;
 
-    Driver *p_driver;
-
-    while (p_driver != nullptr)
+    do
     {
         std::cout << "Enter your name: ";
         std::cin >> name;
@@ -200,31 +188,20 @@ Driver *driverLoginMenu(const struct Database &db)
         std::cout << "Enter your password: ";
         std::cin >> password;
 
-        bool found = false;
         for (auto &pair : db.drivers)
         {
-            auto admin = pair.second;
-            if (admin->name == name)
+            auto driver = pair.second.get();
+            if (driver->name == name && driver->password == password)
             {
-                if (admin->password == password)
-                {
-                    // once a match is found exit loop and return the admin user pointer
-                    p_driver = pair.second;
-                    found = true;
-                    break;
-                }
+                p_driver = pair.second.get();
+                std::cout << ANSI_COLOR_GREEN << "Welcome back " << name << ANSI_COLOR_DEFAULT << std::endl;
+                return p_driver;
             }
-        }
-
-        if (found)
-        {
-            std::cout << ANSI_COLOR_GREEN << "Welcome back " << name << ANSI_COLOR_DEFAULT << std::endl;
-            break;
         }
 
         std::cout << ANSI_COLOR_RED << "invalid login details!\n"
                   << "username or password wrong!" << ANSI_COLOR_DEFAULT << std::endl;
-    }
+    } while (p_driver == nullptr);
 
     return p_driver;
 }
@@ -286,7 +263,7 @@ std::string manageBatteriesMenu()
     return choice;
 }
 
-Battery *addBatteryMenu()
+std::unique_ptr<Battery> addBatteryMenu()
 {
     std::string type;
     float capacity_KWh;
@@ -353,7 +330,7 @@ Battery *addBatteryMenu()
         break;
     }
 
-    return new Battery(type, capacity_KWh, soc, soh, status);
+    return std::make_unique<Battery>(type, capacity_KWh, soc, soh, status);
 }
 
 std::string batteryUpdateMenu()
@@ -428,7 +405,7 @@ struct Battery *selectBatteryForSwapMenu(const struct Database &db)
     for (auto &pair : db.batteries)
     {
         int id = pair.first;
-        Battery *battery = pair.second;
+        Battery *battery = pair.second.get();
 
         if (battery->status == STATUS_READY && battery->soc == 100)
         {
@@ -451,7 +428,7 @@ struct Battery *selectBatteryForSwapMenu(const struct Database &db)
 
         if (db.batteries.find(selectedId) != db.batteries.end())
         {
-            Battery *selectedBattery = db.batteries.at(selectedId);
+            Battery *selectedBattery = db.batteries.at(selectedId).get();
             if (selectedBattery->status == STATUS_READY && selectedBattery->soc == 100)
             {
                 return selectedBattery;
@@ -470,4 +447,155 @@ struct Battery *selectBatteryForSwapMenu(const struct Database &db)
     }
 
     return nullptr;
+}
+
+// Helper function: Pause and wait for Enter
+void pauseMenu()
+{
+    std::cout << std::endl;
+    std::cout << "Press Enter to continue...";
+    std::cin.ignore();
+    std::cin.get();
+}
+
+// Helper function: Get and validate battery ID from user
+int getValidBatteryId(const struct Database &db, const std::string &prompt)
+{
+    int id;
+    std::cout << prompt;
+    std::cin >> id;
+    
+    while (!db.batteryExists(id))
+    {
+        std::cout << ANSI_COLOR_RED << "Battery with ID " << id << " does not exist. Please enter a valid ID: " << ANSI_COLOR_DEFAULT;
+        std::cin >> id;
+    }
+    
+    return id;
+}
+
+// Helper function: Find battery ID from pointer
+int findBatteryId(const struct Database &db, struct Battery *battery)
+{
+    for (const auto &pair : db.batteries)
+    {
+        if (pair.second.get() == battery)
+        {
+            return pair.first;
+        }
+    }
+    return -1;
+}
+
+// Helper function: Handle battery update menu
+void handleBatteryUpdate(struct Database &db)
+{
+    std::cout << std::endl;
+    std::cout << "Update battery selected." << std::endl;
+    int id = getValidBatteryId(db, "Enter battery id: ");
+    auto *battery = db.batteries[id].get();
+    battery->info();
+    std::cout << std::endl;
+
+    bool updating = true;
+    while (updating)
+    {
+        std::string updateOption = batteryUpdateMenu();
+
+        switch (updateOption[0])
+        {
+            case '1':
+            {
+                std::cout << "Enter new battery type: ";
+                std::cin >> battery->type;
+                db.batteriesDirty = true;
+                std::cout << ANSI_COLOR_GREEN << "Battery type updated successfully!" << ANSI_COLOR_DEFAULT << std::endl;
+                break;
+            }
+            case '2':
+            {
+                float newCapacity;
+                std::cout << "Enter new battery capacity (KWh): ";
+                std::cin >> newCapacity;
+                
+                while (newCapacity <= 0)
+                {
+                    std::cout << ANSI_COLOR_RED << "Invalid capacity. Please enter a positive number." << ANSI_COLOR_DEFAULT << std::endl;
+                    std::cout << "Enter new battery capacity (KWh): ";
+                    std::cin >> newCapacity;
+                }
+                
+                battery->capacity_KWh = newCapacity;
+                db.batteriesDirty = true;
+                std::cout << ANSI_COLOR_GREEN << "Battery capacity updated successfully!" << ANSI_COLOR_DEFAULT << std::endl;
+                break;
+            }
+            case '3':
+            {
+                int newSoc;
+                std::cout << "Enter new battery state of charge (SOC) (0-100): ";
+                std::cin >> newSoc;
+                
+                while (newSoc < 0 || newSoc > 100)
+                {
+                    std::cout << ANSI_COLOR_RED << "Invalid soc. Please enter a number between 0 and 100." << ANSI_COLOR_DEFAULT << std::endl;
+                    std::cout << "Enter new battery state of charge (SOC) (0-100): ";
+                    std::cin >> newSoc;
+                }
+                
+                battery->soc = newSoc;
+                db.batteriesDirty = true;
+                std::cout << ANSI_COLOR_GREEN << "Battery SOC updated successfully!" << ANSI_COLOR_DEFAULT << std::endl;
+                break;
+            }
+            case '4':
+            {
+                int newSoh;
+                std::cout << "Enter new battery state of health (SOH) (0-100): ";
+                std::cin >> newSoh;
+                
+                while (newSoh < 0 || newSoh > 100)
+                {
+                    std::cout << ANSI_COLOR_RED << "Invalid soh. Please enter a number between 0 and 100." << ANSI_COLOR_DEFAULT << std::endl;
+                    std::cout << "Enter new battery state of health (SOH) (0-100): ";
+                    std::cin >> newSoh;
+                }
+                
+                battery->soh = newSoh;
+                db.batteriesDirty = true;
+                std::cout << ANSI_COLOR_GREEN << "Battery SOH updated successfully!" << ANSI_COLOR_DEFAULT << std::endl;
+                break;
+            }
+            case '5':
+            {
+                int newStatus;
+                std::cout << "Enter new battery status (0: CHARGING, 1: READY, 2: MAINTENANCE, 3: RENTED): ";
+                std::cin >> newStatus;
+                
+                while (newStatus < 0 || newStatus > 3)
+                {
+                    std::cout << ANSI_COLOR_RED << "Invalid status. Please enter a number between 0 and 3." << ANSI_COLOR_DEFAULT << std::endl;
+                    std::cout << "Enter new battery status (0: CHARGING, 1: READY, 2: MAINTENANCE, 3: RENTED): ";
+                    std::cin >> newStatus;
+                }
+                
+                switch (newStatus)
+                {
+                    case 0: battery->status = STATUS_CHARGING; break;
+                    case 1: battery->status = STATUS_READY; break;
+                    case 2: battery->status = STATUS_MAINTENANCE; break;
+                    case 3: battery->status = STATUS_RENTED; break;
+                }
+                
+                db.batteriesDirty = true;
+                std::cout << ANSI_COLOR_GREEN << "Battery status updated successfully!" << ANSI_COLOR_DEFAULT << std::endl;
+                break;
+            }
+            case '6':
+                updating = false;
+                break;
+            default:
+                std::cout << ANSI_COLOR_RED << "Invalid option." << ANSI_COLOR_DEFAULT << std::endl;
+        }
+    }
 }

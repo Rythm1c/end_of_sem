@@ -29,8 +29,7 @@ void Database::loadAdmins()
         {
             continue; // Skip malformed lines
         }
-        Administrator *admin = new Administrator(name, password);
-        admins[id] = admin;
+        admins[id] = std::make_unique<Administrator>(name, password);
     }
 
     file.close();
@@ -41,10 +40,10 @@ void Database::loadAdmins()
     }
 }
 
-void Database::addAdmin(Administrator *admin)
+void Database::addAdmin(std::unique_ptr<Administrator> admin)
 {
     int newId = nextAdminId++;
-    admins.insert(std::make_pair(newId, admin));
+    admins[newId] = std::move(admin);
     adminsDirty = true;
 }
 
@@ -53,7 +52,6 @@ void Database::removeAdmin(int id)
     auto it = admins.find(id);
     if (it != admins.end())
     {
-        delete it->second;
         admins.erase(it);
         adminsDirty = true;
     }
@@ -95,8 +93,7 @@ void Database::loadBatteries()
         else
             batteryStatus = STATUS_READY; // Default status
 
-        Battery *battery = new Battery(type, capacity_KWh, soc, soh, batteryStatus);
-        batteries[id] = battery;
+        batteries[id] = std::make_unique<Battery>(type, capacity_KWh, soc, soh, batteryStatus);
     }
 
     file.close();
@@ -106,15 +103,15 @@ void Database::loadBatteries()
         nextBatteryId = batteries.rbegin()->first + 1;
     }
 }
-bool Database::batteryExists(int id)
+bool Database::batteryExists(int id) const
 {
     return batteries.find(id) != batteries.end();
 }
 
-void Database::addBattery(struct Battery *battery)
+void Database::addBattery(std::unique_ptr<Battery> battery)
 {
     int newId = nextBatteryId++;
-    batteries[newId] = battery;
+    batteries[newId] = std::move(battery);
     batteriesDirty = true;
 }
 void Database::removeBattery(int id)
@@ -122,7 +119,6 @@ void Database::removeBattery(int id)
     auto it = batteries.find(id);
     if (it != batteries.end())
     {
-        delete it->second;
         batteries.erase(it);
         batteriesDirty = true;
     }
@@ -148,8 +144,7 @@ void Database::loadDrivers()
         {
             continue; // Skip malformed lines
         }
-        Driver *driver = new Driver(name, password, plate, credits);
-        drivers[id] = driver;
+        drivers[id] = std::make_unique<Driver>(name, password, plate, credits);
     }
 
     file.close();
@@ -159,15 +154,15 @@ void Database::loadDrivers()
         nextDriverId = drivers.rbegin()->first + 1;
     }
 }
-bool Database::driverExists(int id)
+bool Database::driverExists(int id) const
 {
     return drivers.find(id) != drivers.end();
 }
 
-void Database::addDriver(struct Driver *driver)
+void Database::addDriver(std::unique_ptr<Driver> driver)
 {
     int newId = nextDriverId++;
-    drivers[newId] = driver;
+    drivers[newId] = std::move(driver);
     driversDirty = true;
 }
 
@@ -176,7 +171,6 @@ void Database::removeDriver(int id)
     auto it = drivers.find(id);
     if (it != drivers.end())
     {
-        delete it->second;
         drivers.erase(it);
         driversDirty = true;
     }
@@ -192,8 +186,8 @@ bool Database::swapBattery(struct Driver *driver, int oldBatteryId, int newBatte
         return false;
     }
 
-    Battery *oldBattery = batteries[oldBatteryId];
-    Battery *newBattery = batteries[newBatteryId];
+    Battery *oldBattery = batteries[oldBatteryId].get();
+    Battery *newBattery = batteries[newBatteryId].get();
 
     // Check if new battery is ready and fully charged
     if (newBattery->status != STATUS_READY || newBattery->soc != 100)
@@ -239,7 +233,7 @@ bool Database::swapBattery(struct Driver *driver, int oldBatteryId, int newBatte
     return true;
 }
 
-bool Database::adminExists(int id)
+bool Database::adminExists(int id) const
 {
     return admins.find(id) != admins.end();
 }
@@ -256,7 +250,7 @@ void Database::saveAdmins()
     for (const auto &pair : admins)
     {
         int id = pair.first;
-        Administrator *admin = pair.second;
+        const Administrator *admin = pair.second.get();
         file << id << " " << admin->name << " " << admin->password << std::endl;
     }
 
@@ -275,7 +269,7 @@ void Database::saveBatteries()
     for (const auto &pair : this->batteries)
     {
         int id = pair.first;
-        Battery *battery = pair.second;
+        Battery *battery = pair.second.get();
         std::string statusStr;
         switch (battery->status)
         {
@@ -314,7 +308,7 @@ void Database::saveDrivers()
     for (const auto &pair : drivers)
     {
         int id = pair.first;
-        Driver *driver = pair.second;
+        Driver *driver = pair.second.get();
         file << id << " " << driver->name << " " << driver->password << " "
              << driver->plate << " " << driver->credits << std::endl;
     }
@@ -369,7 +363,7 @@ void Database::listBatteries(char filter)
             for (auto &pair : this->batteries)
             {
                 int id = pair.first;
-                Battery *battery = pair.second;
+                Battery *battery = pair.second.get();
 
                 std::string status_str;
                 switch (battery->status)
@@ -416,7 +410,7 @@ void Database::listBatteries(char filter)
             for (auto &pair : this->batteries)
             {
                 int id = pair.first;
-                Battery *battery = pair.second;
+                Battery *battery = pair.second.get();
 
                 if (battery->status == STATUS_CHARGING)
                 {
@@ -446,7 +440,7 @@ void Database::listBatteries(char filter)
             for (auto &pair : this->batteries)
             {
                 int id = pair.first;
-                Battery *battery = pair.second;
+                Battery *battery = pair.second.get();
 
                 if (battery->status == STATUS_CHARGING)
                 {
@@ -475,7 +469,7 @@ void Database::listBatteries(char filter)
             for (auto &pair : this->batteries)
             {
                 int id = pair.first;
-                Battery *battery = pair.second;
+                Battery *battery = pair.second.get();
 
                 if (battery->status == STATUS_CHARGING)
                 {
@@ -513,7 +507,7 @@ void Database::listDrivers()
         for (auto &pair : this->drivers)
         {
             int id = pair.first;
-            Driver *driver = pair.second;
+            Driver *driver = pair.second.get();
 
             std::cout << ANSI_COLOR_PURPLE << std::left
                       << std::setw(6) << id
@@ -532,21 +526,7 @@ void Database::listDrivers()
 
 void Database::clear()
 {
-    for (auto &pair : this->admins)
-    {
-        delete pair.second;
-    }
     this->admins.clear();
-
-    for (auto &pair : this->drivers)
-    {
-        delete pair.second;
-    }
     this->drivers.clear();
-
-    for (auto &pair : this->batteries)
-    {
-        delete pair.second;
-    }
     this->batteries.clear();
 }
