@@ -23,7 +23,6 @@ set(SOURCES
     admin.cc
     battery.cc
     database.cc
-    driver.cc
     menus.cc
 )
 

@@ -392,14 +392,15 @@ struct Battery *selectBatteryForSwapMenu(const struct Database &db)
 
     std::cout << ANSI_COLOR_YELLOW << "\n=== Available Batteries for Swap ===" << ANSI_COLOR_DEFAULT << std::endl;
     std::cout << ANSI_COLOR_YELLOW << std::left
-              << std::setw(6) << "ID"
-              << std::setw(15) << "Type"
-              << std::setw(15) << "Capacity(kWh)"
-              << std::setw(8) << "SOC(%)"
-              << std::setw(8) << "SOH(%)"
+              << "| " << std::setw(6) << "ID"
+              << " | " << std::setw(15) << "Type"
+              << " | " << std::setw(15) << "Capacity(kWh)"
+              << " | " << std::setw(8) << "SOC(%)"
+              << " | " << std::setw(8) << "SOH(%)"
+              << " |"
               << ANSI_COLOR_DEFAULT << std::endl;
 
-    std::cout << ANSI_COLOR_YELLOW << std::string(52, '-') << ANSI_COLOR_DEFAULT << std::endl;
+    std::cout << ANSI_COLOR_YELLOW << std::string(68, '-') << ANSI_COLOR_DEFAULT << std::endl;
 
     // Display only ready batteries with 100% SoC
     for (auto &pair : db.batteries)
@@ -410,11 +411,12 @@ struct Battery *selectBatteryForSwapMenu(const struct Database &db)
         if (battery->status == STATUS_READY && battery->soc == 100)
         {
             std::cout << ANSI_COLOR_PURPLE << std::left
-                      << std::setw(6) << id
-                      << std::setw(15) << battery->type
-                      << std::setw(15) << battery->capacity_KWh
-                      << std::setw(8) << battery->soc
-                      << std::setw(8) << battery->soh
+                      << "| " << std::setw(6) << id
+                      << " | " << std::setw(15) << battery->type
+                      << " | " << std::setw(15) << battery->capacity_KWh
+                      << " | " << std::setw(8) << battery->soc
+                      << " | " << std::setw(8) << battery->soh
+                      << " |"
                       << ANSI_COLOR_DEFAULT << std::endl;
         }
     }

@@ -350,15 +350,16 @@ void Database::listBatteries(char filter)
         {
         case 'a':
             std::cout << ANSI_COLOR_YELLOW << std::left
-                      << std::setw(6) << "ID"
-                      << std::setw(15) << "Type"
-                      << std::setw(15) << "Capacity(kWh)"
-                      << std::setw(8) << "SOC(%)"
-                      << std::setw(8) << "SOH(%)"
-                      << std::setw(15) << "Status"
+                      << "| " << std::setw(6) << "ID"
+                      << " | " << std::setw(15) << "Type"
+                      << " | " << std::setw(15) << "Capacity(kWh)"
+                      << " | " << std::setw(8) << "SOC(%)"
+                      << " | " << std::setw(8) << "SOH(%)"
+                      << " | " << std::setw(15) << "Status"
+                      << " |"
                       << ANSI_COLOR_DEFAULT << std::endl;
 
-            std::cout << ANSI_COLOR_YELLOW << std::string(67, '-') << ANSI_COLOR_DEFAULT << std::endl;
+            std::cout << ANSI_COLOR_YELLOW << std::string(83, '-') << ANSI_COLOR_DEFAULT << std::endl;
 
             for (auto &pair : this->batteries)
             {
@@ -385,12 +386,13 @@ void Database::listBatteries(char filter)
                 }
 
                 std::cout << ANSI_COLOR_PURPLE << std::left
-                          << std::setw(6) << id
-                          << std::setw(15) << battery->type
-                          << std::setw(15) << battery->capacity_KWh
-                          << std::setw(8) << battery->soc
-                          << std::setw(8) << battery->soh
-                          << std::setw(15) << status_str
+                          << "| " << std::setw(6) << id
+                          << " | " << std::setw(15) << battery->type
+                          << " | " << std::setw(15) << battery->capacity_KWh
+                          << " | " << std::setw(8) << battery->soc
+                          << " | " << std::setw(8) << battery->soh
+                          << " | " << std::setw(15) << status_str
+                          << " |"
                           << ANSI_COLOR_DEFAULT << std::endl;
             }
 
@@ -399,14 +401,15 @@ void Database::listBatteries(char filter)
             std::cout << ANSI_COLOR_YELLOW << "=== List of charging batteries ===" << ANSI_COLOR_DEFAULT << std::endl;
 
             std::cout << ANSI_COLOR_YELLOW << std::left
-                      << std::setw(6) << "ID"
-                      << std::setw(15) << "Type"
-                      << std::setw(15) << "Capacity(kWh)"
-                      << std::setw(8) << "SOC(%)"
-                      << std::setw(8) << "SOH(%)"
+                      << "| " << std::setw(6) << "ID"
+                      << " | " << std::setw(15) << "Type"
+                      << " | " << std::setw(15) << "Capacity(kWh)"
+                      << " | " << std::setw(8) << "SOC(%)"
+                      << " | " << std::setw(8) << "SOH(%)"
+                      << " |"
                       << ANSI_COLOR_DEFAULT << std::endl;
 
-            std::cout << ANSI_COLOR_YELLOW << std::string(52, '-') << ANSI_COLOR_DEFAULT << std::endl;
+            std::cout << ANSI_COLOR_YELLOW << std::string(68, '-') << ANSI_COLOR_DEFAULT << std::endl;
             for (auto &pair : this->batteries)
             {
                 int id = pair.first;
@@ -415,11 +418,12 @@ void Database::listBatteries(char filter)
                 if (battery->status == STATUS_CHARGING)
                 {
                     std::cout << ANSI_COLOR_PURPLE << std::left
-                              << std::setw(6) << id
-                              << std::setw(15) << battery->type
-                              << std::setw(15) << battery->capacity_KWh
-                              << std::setw(8) << battery->soc
-                              << std::setw(8) << battery->soh
+                              << "| " << std::setw(6) << id
+                              << " | " << std::setw(15) << battery->type
+                              << " | " << std::setw(15) << battery->capacity_KWh
+                              << " | " << std::setw(8) << battery->soc
+                              << " | " << std::setw(8) << battery->soh
+                              << " |"
                               << ANSI_COLOR_DEFAULT << std::endl;
                 }
             }
@@ -429,27 +433,29 @@ void Database::listBatteries(char filter)
             std::cout << ANSI_COLOR_YELLOW << "=== List of available batteries ===" << ANSI_COLOR_DEFAULT << std::endl;
 
             std::cout << ANSI_COLOR_YELLOW << std::left
-                      << std::setw(6) << "ID"
-                      << std::setw(15) << "Type"
-                      << std::setw(15) << "Capacity(kWh)"
-                      << std::setw(8) << "SOC(%)"
-                      << std::setw(8) << "SOH(%)"
+                      << "| " << std::setw(6) << "ID"
+                      << " | " << std::setw(15) << "Type"
+                      << " | " << std::setw(15) << "Capacity(kWh)"
+                      << " | " << std::setw(8) << "SOC(%)"
+                      << " | " << std::setw(8) << "SOH(%)"
+                      << " |"
                       << ANSI_COLOR_DEFAULT << std::endl;
 
-            std::cout << ANSI_COLOR_YELLOW << std::string(52, '-') << ANSI_COLOR_DEFAULT << std::endl;
+            std::cout << ANSI_COLOR_YELLOW << std::string(68, '-') << ANSI_COLOR_DEFAULT << std::endl;
             for (auto &pair : this->batteries)
             {
                 int id = pair.first;
                 Battery *battery = pair.second.get();
 
-                if (battery->status == STATUS_CHARGING)
+                if (battery->status == STATUS_READY)
                 {
                     std::cout << ANSI_COLOR_PURPLE << std::left
-                              << std::setw(6) << id
-                              << std::setw(15) << battery->type
-                              << std::setw(15) << battery->capacity_KWh
-                              << std::setw(8) << battery->soc
-                              << std::setw(8) << battery->soh
+                              << "| " << std::setw(6) << id
+                              << " | " << std::setw(15) << battery->type
+                              << " | " << std::setw(15) << battery->capacity_KWh
+                              << " | " << std::setw(8) << battery->soc
+                              << " | " << std::setw(8) << battery->soh
+                              << " |"
                               << ANSI_COLOR_DEFAULT << std::endl;
                 }
             }
@@ -458,27 +464,29 @@ void Database::listBatteries(char filter)
             std::cout << ANSI_COLOR_YELLOW << "=== List of batteries under maintainance ===" << ANSI_COLOR_DEFAULT << std::endl;
 
             std::cout << ANSI_COLOR_YELLOW << std::left
-                      << std::setw(6) << "ID"
-                      << std::setw(15) << "Type"
-                      << std::setw(15) << "Capacity(kWh)"
-                      << std::setw(8) << "SOC(%)"
-                      << std::setw(8) << "SOH(%)"
+                      << "| " << std::setw(6) << "ID"
+                      << " | " << std::setw(15) << "Type"
+                      << " | " << std::setw(15) << "Capacity(kWh)"
+                      << " | " << std::setw(8) << "SOC(%)"
+                      << " | " << std::setw(8) << "SOH(%)"
+                      << " |"
                       << ANSI_COLOR_DEFAULT << std::endl;
 
-            std::cout << ANSI_COLOR_YELLOW << std::string(52, '-') << ANSI_COLOR_DEFAULT << std::endl;
+            std::cout << ANSI_COLOR_YELLOW << std::string(68, '-') << ANSI_COLOR_DEFAULT << std::endl;
             for (auto &pair : this->batteries)
             {
                 int id = pair.first;
                 Battery *battery = pair.second.get();
 
-                if (battery->status == STATUS_CHARGING)
+                if (battery->status == STATUS_MAINTENANCE)
                 {
                     std::cout << ANSI_COLOR_PURPLE << std::left
-                              << std::setw(6) << id
-                              << std::setw(15) << battery->type
-                              << std::setw(15) << battery->capacity_KWh
-                              << std::setw(8) << battery->soc
-                              << std::setw(8) << battery->soh
+                              << "| " << std::setw(6) << id
+                              << " | " << std::setw(15) << battery->type
+                              << " | " << std::setw(15) << battery->capacity_KWh
+                              << " | " << std::setw(8) << battery->soc
+                              << " | " << std::setw(8) << battery->soh
+                              << " |"
                               << ANSI_COLOR_DEFAULT << std::endl;
                 }
             }
@@ -490,13 +498,14 @@ void Database::listBatteries(char filter)
 void Database::listDrivers()
 {
     std::cout << ANSI_COLOR_YELLOW << std::left
-              << std::setw(6) << "ID"
-              << std::setw(20) << "Name"
-              << std::setw(20) << "License Plate"
-              << std::setw(12) << "Credits"
+              << "| " << std::setw(6) << "ID"
+              << " | " << std::setw(20) << "Name"
+              << " | " << std::setw(20) << "License Plate"
+              << " | " << std::setw(12) << "Credits"
+              << " |"
               << ANSI_COLOR_DEFAULT << std::endl;
 
-    std::cout << ANSI_COLOR_YELLOW << std::string(58, '-') << ANSI_COLOR_DEFAULT << std::endl;
+    std::cout << ANSI_COLOR_YELLOW << std::string(71, '-') << ANSI_COLOR_DEFAULT << std::endl;
 
     if (this->drivers.empty())
     {
@@ -510,10 +519,11 @@ void Database::listDrivers()
             Driver *driver = pair.second.get();
 
             std::cout << ANSI_COLOR_PURPLE << std::left
-                      << std::setw(6) << id
-                      << std::setw(20) << driver->name
-                      << std::setw(20) << driver->plate
-                      << std::setw(12) << std::fixed << std::setprecision(2) << driver->credits
+                      << "| " << std::setw(6) << id
+                      << " | " << std::setw(20) << driver->name
+                      << " | " << std::setw(20) << driver->plate
+                      << " | " << std::setw(12) << std::fixed << std::setprecision(2) << driver->credits
+                      << " |"
                       << ANSI_COLOR_DEFAULT << std::endl;
         }
     }
